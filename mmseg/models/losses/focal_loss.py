@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
+from ..builder import LOSSES
+
 @LOSSES.register_module
 class FocalLoss(nn.Module):
     r"""
