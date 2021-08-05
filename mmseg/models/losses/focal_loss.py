@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from ..builder import LOSSES
+from .utils import get_class_weight, weighted_loss
 
 @LOSSES.register_module
 class FocalLoss(nn.Module):
@@ -38,7 +39,7 @@ class FocalLoss(nn.Module):
         self.class_num = class_num
         self.size_average = size_average
 
-    def forward(self, inputs, targets):
+    def forward(self, inputs, targets , **kwargs):
         N = inputs.size(0)
         C = inputs.size(1)
         P = F.softmax(inputs)
