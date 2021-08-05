@@ -40,7 +40,7 @@ class FocalLoss(nn.Module):
         self.size_average = size_average
 
     def forward(self, inputs, targets , **kwargs):
-        N = inputs.size(0)
+        N = inputs.size(0) * inputs.size(2) * inputs.size(3)
         C = inputs.size(1)
         P = F.softmax(inputs)
 
