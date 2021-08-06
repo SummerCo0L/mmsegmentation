@@ -1,73 +1,115 @@
+import math
+from typing import Optional
+from functools import partial
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.modules.loss import _Loss
 from torch.autograd import Variable
 
 from ..builder import LOSSES
 from .utils import get_class_weight, weighted_loss
 
-@LOSSES.register_module
-class FocalLoss(nn.Module):
-    r"""
-        This criterion is a implemenation of Focal Loss, which is proposed in 
-        Focal Loss for Dense Object Detection.
-
-            Loss(x, class) = - \alpha (1-softmax(x)[class])^gamma \log(softmax(x)[class])
-
-        The losses are averaged across observations for each minibatch.
-
-        Args:
-            alpha(1D Tensor, Variable) : the scalar factor for this criterion
-            gamma(float, double) : gamma > 0; reduces the relative loss for well-classiﬁed examples (p > .5), 
-                                   putting more focus on hard, misclassiﬁed examples
-            size_average(bool): By default, the losses are averaged over observations for each minibatch.
-                                However, if the field size_average is set to False, the losses are
-                                instead summed for each minibatch.
-
-
+def focal_loss_with_logits(
+    output: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+    alpha: Optional[float] = 0.25,
+    reduction: str = "mean",
+    normalized: bool = False,
+    reduced_threshold: Optional[float] = None,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    """Compute binary focal loss between target and output logits.
+    See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
+    Args:
+        output: Tensor of arbitrary shape (predictions of the model)
+        target: Tensor of the same shape as input
+        gamma: Focal loss power factor
+        alpha: Weight factor to balance positive and negative samples. Alpha must be in [0...1] range,
+            high values will give more weight to positive class.
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            'none' | 'mean' | 'sum' | 'batchwise_mean'. 'none': no reduction will be applied,
+            'mean': the sum of the output will be divided by the number of
+            elements in the output, 'sum': the output will be summed. Note: :attr:`size_average`
+            and :attr:`reduce` are in the process of being deprecated, and in the meantime,
+            specifying either of those two args will override :attr:`reduction`.
+            'batchwise_mean' computes mean loss per sample in batch. Default: 'mean'
+        normalized (bool): Compute normalized focal loss (https://arxiv.org/pdf/1909.07829.pdf).
+        reduced_threshold (float, optional): Compute reduced focal loss (https://arxiv.org/abs/1903.01347).
+    References:
+        https://github.com/open-mmlab/mmdetection/blob/master/mmdet/core/loss/losses.py
     """
-    def __init__(self, class_num, alpha=None, gamma=2, size_average=True):
-        super(FocalLoss, self).__init__()
-        if alpha is None:
-            self.alpha = Variable(torch.ones(class_num, 1))
-        else:
-            if isinstance(alpha, Variable):
-                self.alpha = alpha
-            else:
-                self.alpha = Variable(alpha)
-        self.gamma = gamma
-        self.class_num = class_num
-        self.size_average = size_average
+    target = target.type_as(output)
 
-    def forward(self, inputs, targets , **kwargs):
-        N = inputs.size(0) * inputs.size(2) * inputs.size(3)
-        C = inputs.size(1)
-        P = F.softmax(inputs)
+    logpt = F.binary_cross_entropy_with_logits(output, target, reduction="none")
+    pt = torch.exp(-logpt)
 
-        class_mask = inputs.data.new(N, C).fill_(0)
-        class_mask = Variable(class_mask)
-        ids = targets.view(-1, 1)
-        class_mask.scatter_(1, ids.data, 1.)
-        #print(class_mask)
+    # compute the loss
+    if reduced_threshold is None:
+        focal_term = (1.0 - pt).pow(gamma)
+    else:
+        focal_term = ((1.0 - pt) / reduced_threshold).pow(gamma)
+        focal_term[pt < reduced_threshold] = 1
 
+    loss = focal_term * logpt
 
-        if inputs.is_cuda and not self.alpha.is_cuda:
-            self.alpha = self.alpha.cuda()
-        alpha = self.alpha[ids.data.view(-1)]
+    if alpha is not None:
+        loss *= alpha * target + (1 - alpha) * (1 - target)
 
-        probs = (P*class_mask).sum(1).view(-1,1)
+    if normalized:
+        norm_factor = focal_term.sum(dtype=torch.float32).clamp_min(eps)
+        loss /= norm_factor
 
-        log_p = probs.log()
-        #print('probs size= {}'.format(probs.size()))
-        #print(probs)
+    if reduction == "mean":
+        loss = loss.mean()
+    if reduction == "sum":
+        loss = loss.sum(dtype=torch.float32)
+    if reduction == "batchwise_mean":
+        loss = loss.sum(dim=0, dtype=torch.float32)
 
-        batch_loss = -alpha*(torch.pow((1-probs), self.gamma))*log_p 
-        #print('-----bacth_loss------')
-        #print(batch_loss)
+    return loss
 
 
-        if self.size_average:
-            loss = batch_loss.mean()
-        else:
-            loss = batch_loss.sum()
+@LOSSES.register_module
+class FocalLoss(_Loss):
+    def __init__(
+        self, alpha=None, gamma=2, ignore_index=None, reduction="mean", normalized=False, reduced_threshold=None
+    ):
+        """
+        Focal loss for multi-class problem.
+        :param alpha:
+        :param gamma:
+        :param ignore_index: If not None, targets with given index are ignored
+        :param reduced_threshold: A threshold factor for computing reduced focal loss
+        """
+        super().__init__()
+        self.ignore_index = ignore_index
+        self.focal_loss_fn = partial(
+            focal_loss_with_logits,
+            alpha=alpha,
+            gamma=gamma,
+            reduced_threshold=reduced_threshold,
+            reduction=reduction,
+            normalized=normalized,
+        )
+
+    def forward(self, label_input, label_target, **kwargs):
+        num_classes = label_input.size(1)
+        loss = 0
+
+        # Filter anchors with -1 label from loss computation
+        if self.ignore_index is not None:
+            not_ignored = label_target != self.ignore_index
+
+        for cls in range(num_classes):
+            cls_label_target = (label_target == cls).long()
+            cls_label_input = label_input[:, cls, ...]
+
+            if self.ignore_index is not None:
+                cls_label_target = cls_label_target[not_ignored]
+                cls_label_input = cls_label_input[not_ignored]
+
+            loss += self.focal_loss_fn(cls_label_input, cls_label_target)
         return loss
