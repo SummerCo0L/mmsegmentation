@@ -3,7 +3,7 @@ get_tp_fp_fn, SoftDiceLoss, and DC_and_CE/TopK_loss are from https://github.com/
 """
 
 import torch
-from ND_Crossentropy import CrossentropyND, TopKLoss, WeightedCrossEntropyLoss
+from .ND_Crossentropy import CrossentropyND, TopKLoss, WeightedCrossEntropyLoss
 from torch import nn
 from torch.autograd import Variable
 from torch.nn.modules.loss import _Loss
@@ -209,7 +209,7 @@ class SSLoss(_Loss):
         self.smooth = smooth
         self.r = 0.1 # weight parameter in SS paper
 
-    def forward(self, net_output, gt, loss_mask=None):
+    def forward(self, net_output, gt, loss_mask=None, **kwargs):
         shp_x = net_output.shape
         shp_y = gt.shape
         # class_num = shp_x[1]
