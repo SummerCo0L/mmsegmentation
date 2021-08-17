@@ -98,7 +98,7 @@ class GDiceLoss(_Loss):
         self.apply_nonlin = apply_nonlin
         self.smooth = smooth
 
-    def forward(self, net_output, gt):
+    def forward(self, net_output, gt, **kwargs):
         shp_x = net_output.shape # (batch size,class_num,x,y,z)
         shp_y = gt.shape # (batch size,1,x,y,z)
         # one hot code for gt
@@ -158,7 +158,7 @@ class GDiceLossV2(_Loss):
         self.apply_nonlin = apply_nonlin
         self.smooth = smooth
 
-    def forward(self, net_output, gt):
+    def forward(self, net_output, gt, **kwargs):
         shp_x = net_output.shape # (batch size,class_num,x,y,z)
         shp_y = gt.shape # (batch size,1,x,y,z)
         # one hot code for gt
@@ -271,7 +271,7 @@ class SoftDiceLoss(_Loss):
         self.apply_nonlin = apply_nonlin
         self.smooth = smooth
 
-    def forward(self, x, y, loss_mask=None):
+    def forward(self, x, y, loss_mask=None, **kwargs):
         shp_x = x.shape
 
         if self.batch_dice:
@@ -311,7 +311,7 @@ class IoULoss(_Loss):
         self.apply_nonlin = apply_nonlin
         self.smooth = smooth
 
-    def forward(self, x, y, loss_mask=None):
+    def forward(self, x, y, loss_mask=None, **kwargs):
         shp_x = x.shape
 
         if self.batch_dice:
@@ -353,7 +353,7 @@ class TverskyLoss(_Loss):
         self.alpha = 0.3
         self.beta = 0.7
 
-    def forward(self, x, y, loss_mask=None):
+    def forward(self, x, y, loss_mask=None, **kwargs):
         shp_x = x.shape
 
         if self.batch_dice:
@@ -389,7 +389,7 @@ class FocalTversky_loss(_Loss):
         self.gamma = gamma
         self.tversky = TverskyLoss(**tversky_kwargs)
 
-    def forward(self, net_output, target):
+    def forward(self, net_output, target, **kwargs):
         tversky_loss = 1 + self.tversky(net_output, target) # = 1-tversky(net_output, target)
         focal_tversky = torch.pow(tversky_loss, self.gamma)
         return focal_tversky
@@ -411,7 +411,7 @@ class AsymLoss(_Loss):
         self.smooth = smooth
         self.beta = 1.5
 
-    def forward(self, x, y, loss_mask=None):
+    def forward(self, x, y, loss_mask=None, **kwargs):
         shp_x = x.shape
 
         if self.batch_dice:
@@ -443,7 +443,7 @@ class DC_and_CE_loss(_Loss):
         self.ce = CrossentropyND(**ce_kwargs)
         self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
 
-    def forward(self, net_output, target):
+    def forward(self, net_output, target, **kwargs):
         dc_loss = self.dc(net_output, target)
         ce_loss = self.ce(net_output, target)
         if self.aggregate == "sum":
@@ -462,7 +462,7 @@ class PenaltyGDiceLoss(_Loss):
         self.k = 2.5
         self.gdc = GDiceLoss(apply_nonlin=softmax_helper, **gdice_kwargs)
 
-    def forward(self, net_output, target):
+    def forward(self, net_output, target, **kwargs):
         gdc_loss = self.gdc(net_output, target)
         penalty_gdc = gdc_loss / (1 + self.k * (1 - gdc_loss))
 
@@ -478,7 +478,7 @@ class DC_and_topk_loss(_Loss):
         self.ce = TopKLoss(**ce_kwargs)
         self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
 
-    def forward(self, net_output, target):
+    def forward(self, net_output, target, **kwargs):
         dc_loss = self.dc(net_output, target)
         ce_loss = self.ce(net_output, target)
         if self.aggregate == "sum":
@@ -501,7 +501,7 @@ class ExpLog_loss(_Loss):
         self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
         self.gamma = gamma
 
-    def forward(self, net_output, target):
+    def forward(self, net_output, target, **kwargs):
         dc_loss = -self.dc(net_output, target) # weight=0.8
         wce_loss = self.wce(net_output, target) # weight=0.2
         # with torch.no_grad():
