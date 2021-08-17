@@ -10,5 +10,7 @@ from .utils import reduce_loss, weight_reduce_loss, weighted_loss
 __all__ = [
     'accuracy', 'Accuracy', 'cross_entropy', 'binary_cross_entropy',
     'mask_cross_entropy', 'CrossEntropyLoss', 'reduce_loss', 'FocalLoss',
-    'weight_reduce_loss', 'weighted_loss', 'LovaszLoss', 'DiceLoss','SSLoss'
+    'weight_reduce_loss', 'weighted_loss', 'LovaszLoss', 'DiceLoss','SSLoss',
+    'GDiceLoss','GDiceLossV2','AsymLoss','SoftDiceLoss','IoULoss','TverskyLoss',
+    'FocalTversky_loss','DC_and_CE_loss','PenaltyGDiceLoss'
 ]

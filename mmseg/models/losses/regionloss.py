@@ -84,7 +84,8 @@ def get_tp_fp_fn(net_output, gt, axes=None, mask=None, square=False):
     return tp, fp, fn
 
 
-class GDiceLoss(nn.Module):
+@LOSSES.register_module
+class GDiceLoss(_Loss):
     def __init__(self, apply_nonlin=None, smooth=1e-5):
         """
         Generalized Dice;
@@ -143,7 +144,8 @@ def flatten(tensor):
     # Flatten: (C, N, D, H, W) -> (C, N * D * H * W)
     return transposed.view(C, -1)
 
-class GDiceLossV2(nn.Module):
+@LOSSES.register_module
+class GDiceLossV2(_Loss):
     def __init__(self, apply_nonlin=None, smooth=1e-5):
         """
         Generalized Dice;
@@ -254,8 +256,8 @@ class SSLoss(_Loss):
         return ss
 
 
-
-class SoftDiceLoss(nn.Module):
+@LOSSES.register_module
+class SoftDiceLoss(_Loss):
     def __init__(self, apply_nonlin=None, batch_dice=False, do_bg=True, smooth=1.,
                  square=False):
         """
@@ -293,7 +295,8 @@ class SoftDiceLoss(nn.Module):
 
         return -dc
 
-class IoULoss(nn.Module):
+@LOSSES.register_module
+class IoULoss(_Loss):
     def __init__(self, apply_nonlin=None, batch_dice=False, do_bg=True, smooth=1.,
                  square=False):
         """
@@ -333,7 +336,8 @@ class IoULoss(nn.Module):
 
         return -iou
 
-class TverskyLoss(nn.Module):
+@LOSSES.register_module
+class TverskyLoss(_Loss):
     def __init__(self, apply_nonlin=None, batch_dice=False, do_bg=True, smooth=1.,
                  square=False):
         """
@@ -374,7 +378,8 @@ class TverskyLoss(nn.Module):
 
         return -tversky
 
-class FocalTversky_loss(nn.Module):
+@LOSSES.register_module
+class FocalTversky_loss(_Loss):
     """
     paper: https://arxiv.org/pdf/1810.07842.pdf
     author code: https://github.com/nabsabraham/focal-tversky-unet/blob/347d39117c24540400dfe80d106d2fb06d2b99e1/losses.py#L65
@@ -390,7 +395,8 @@ class FocalTversky_loss(nn.Module):
         return focal_tversky
 
 
-class AsymLoss(nn.Module):
+@LOSSES.register_module
+class AsymLoss(_Loss):
     def __init__(self, apply_nonlin=None, batch_dice=False, do_bg=True, smooth=1.,
                  square=False):
         """
@@ -429,7 +435,8 @@ class AsymLoss(nn.Module):
 
         return -asym
 
-class DC_and_CE_loss(nn.Module):
+@LOSSES.register_module
+class DC_and_CE_loss(_Loss):
     def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum"):
         super(DC_and_CE_loss, self).__init__()
         self.aggregate = aggregate
@@ -445,7 +452,8 @@ class DC_and_CE_loss(nn.Module):
             raise NotImplementedError("nah son") # reserved for other stuff (later)
         return result
 
-class PenaltyGDiceLoss(nn.Module):
+@LOSSES.register_module
+class PenaltyGDiceLoss(_Loss):
     """
     paper: https://openreview.net/forum?id=H1lTh8unKN
     """
@@ -462,7 +470,8 @@ class PenaltyGDiceLoss(nn.Module):
 
         
 
-class DC_and_topk_loss(nn.Module):
+@LOSSES.register_module
+class DC_and_topk_loss(_Loss):
     def __init__(self, soft_dice_kwargs, ce_kwargs, aggregate="sum"):
         super(DC_and_topk_loss, self).__init__()
         self.aggregate = aggregate
@@ -480,7 +489,8 @@ class DC_and_topk_loss(nn.Module):
 
 
 
-class ExpLog_loss(nn.Module):
+@LOSSES.register_module
+class ExpLog_loss(_Loss):
     """
     paper: 3D Segmentation with Exponential Logarithmic Loss for Highly Unbalanced Object Sizes
     https://arxiv.org/pdf/1809.00076.pdf
