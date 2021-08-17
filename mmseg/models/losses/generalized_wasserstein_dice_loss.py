@@ -30,7 +30,7 @@ class GeneralizedWassersteinDiceLoss(_Loss):
         COVID-19 patients."
         Tilborghs, S. et al. arXiv preprint arXiv:2007.15546 (2020).
     """
-    def __init__(self, dist_matrix, weighting_mode='default', reduction='mean'):
+    def __init__(self, weighting_mode='default', reduction='mean'):
         """
         :param dist_matrix: 2d tensor or 2d numpy array; matrix of distances
         between the classes.
