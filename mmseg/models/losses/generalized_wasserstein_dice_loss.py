@@ -56,7 +56,13 @@ class GeneralizedWassersteinDiceLoss(_Loss):
         assert weighting_mode in SUPPORTED_WEIGHTING, \
             "weighting_mode must be in %s" % str(SUPPORTED_WEIGHTING)
 
-        self.M = dist_matrix
+        self.M = np.array([
+            [0., 1., 1., 1., 1.],
+            [1., 0., 0.5, 0.5, 0.5],
+            [1., 0.5, 0., 0.5, 0.5],
+            [1., 0.5, 0.5, 0., 0.5],
+            [1., 0.5, 0.5, 0.5, 0.]
+        ])
         if isinstance(self.M, np.ndarray):
             self.M = torch.from_numpy(self.M)
         if torch.max(self.M) != 1:
