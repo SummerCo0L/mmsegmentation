@@ -68,3 +68,10 @@ Finnally, you can run the training script:
 ```
 python script/train.py 
 ```
+
+To convert trained models to Torch Script format, use the following command with the corresponding paths
+```
+python script/create_torchscript.py --in_model INPUT_MODEL --out_model OUTPUT_MODEL
+```
+
+In the command above, `INPUT_MODEL` is the path to .pth file and `OUTPUT_MODEL` is the path to .pt file. For example: `python script/create_torchscript.py --in_model ./weight/best.pth --out_model ./weight/best.pt`
