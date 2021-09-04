@@ -12,7 +12,7 @@ import argparse
 
 from mmseg.models import build_segmentor
 
-from .config import *
+from script.config import *
 
 torch.manual_seed(3)
 
@@ -134,9 +134,15 @@ if __name__ == '__main__':
     parser.add_argument('--out_model', type=str)
     args = parser.parse_args()
 
+    checkpoint = torch.load(args.in_model)
+    checkpoint['meta']['PALETTE'] = ([128, 128, 128], [129, 127, 38], [120, 69, 125], [53, 125, 34], 
+           [0, 11, 123])
+    torch.save(checkpoint, args.in_model)
+
     # build the model from a config file and a checkpoint file
     model = init_segmentor(cfg, args.in_model, device='cuda:0')
     model.half()
+
 
     pytorch2libtorch(
         model,

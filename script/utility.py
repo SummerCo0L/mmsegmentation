@@ -8,12 +8,10 @@ import time
 import tqdm
 from PIL import Image
 from functools import partial
-train_on_gpu = True
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score

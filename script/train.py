@@ -13,7 +13,6 @@ import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -34,8 +33,8 @@ from mmseg.models import build_segmentor
 from mmseg.apis import train_segmentor
 import mmcv
 
-from .utility import *
-from .config import *
+from script.utility import *
+from script.config import *
 
 
 # Define the new Dataset class

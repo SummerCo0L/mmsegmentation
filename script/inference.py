@@ -13,7 +13,6 @@ import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -27,7 +26,7 @@ from nibabel.testing import data_path
 import nibabel as nib
 from nibabel.viewers import OrthoSlicer3D
 
-from .utility import *
+from script.utility import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
