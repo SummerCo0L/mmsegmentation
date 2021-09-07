@@ -67,9 +67,9 @@ cfg.model.decode_head[1].norm_cfg = cfg.norm_cfg
 cfg.model.decode_head[0].num_classes = 5
 cfg.model.decode_head[1].num_classes = 5
 cfg.model.decode_head[0].loss_decode=dict(\
-                type='DiceLoss')
+                type='FocalLoss')
 cfg.model.decode_head[1].loss_decode=dict(\
-                type='DiceLoss')
+                type='FocalLoss')
 # cfg.model.auxiliary_head.num_classes = 5
 
 # Modify dataset type and path
@@ -143,7 +143,7 @@ cfg.work_dir = './weight'
 cfg.runner = dict(type='EpochBasedRunner', max_epochs=5)
 cfg.log_config.interval = 100
 cfg.evaluation.interval = 200
-cfg.checkpoint_config.interval = 20000
+cfg.checkpoint_config.interval = 4000
 # cfg.checkpoint_config.by_epoch=True
 
 # cfg.resume_from = '/content/drive/MyDrive/Contest_Folder/FLARE2021/weight/logs/segmentation/hrnet_512x512/best.pth'

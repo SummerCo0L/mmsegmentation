@@ -42,14 +42,14 @@ classes = ('Background','Liver','Kidney','Speen','Pancrea')
 palette = [[128, 128, 128], [129, 127, 38], [120, 69, 125], [53, 125, 34], 
            [0, 11, 123]]
 
-@DATASETS.register_module()
-class FlareDataset(CustomDataset):
-    CLASSES = classes
-    PALETTE = palette
-    def __init__(self, split, **kwargs):
-        super().__init__(img_suffix='.png', seg_map_suffix='.png', 
-        split=split, **kwargs)
-        assert osp.exists(self.img_dir) and self.split is not None
+# @DATASETS.register_module()
+# class FlareDataset(CustomDataset):
+#     CLASSES = classes
+#     PALETTE = palette
+#     def __init__(self, split, **kwargs):
+#         super().__init__(img_suffix='.png', seg_map_suffix='.png', 
+#         split=split, **kwargs)
+#         assert osp.exists(self.img_dir) and self.split is not None
 
 if __name__ == '__main__':
     # Build the dataset
