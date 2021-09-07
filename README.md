@@ -17,7 +17,6 @@ pip install nibabel
 pip install Pillow
 pip install -U scikit-learn
 pip install -e .
-cd mmsegmentation
 ```
 
 # Inference
@@ -34,37 +33,45 @@ You will need to adapt the corresponding path to your TorchScript model, your fo
 
 # Train
 
-Suppose you have a dataset whose format are .nii files, you need to convert them to 2D images. NII_PATH and PNG_PATH represent for the folder contain .nii inputs and .png outputs, respectively.
+## Prepare data
+
+Suppose you have a dataset whose format are .nii files, you need to convert them to 2D images. We have provided our structured FLARE2021 dataset [here](https://drive.google.com/file/d/1-mQ_FOzutCb2HK3GJm39Grfq_BAOUKb5/view?usp=sharing). 
+
+<!-- NII_PATH and PNG_PATH represent for the folder contain .nii inputs and .png outputs, respectively.
 
 ```
 python script/prepare_data.py --nii_path NII_PATH --png_path PNG_PATH 
 ```
 
-Now the 2D image's path should have the following format `PNG_PATH/{SEQUENCE}/{FRAME}.png`. This step should be applied to both the image folder and label mask folder.
+Now the 2D image's path should have the following format `PNG_PATH/{SEQUENCE}/{FRAME}.png`. This step should be applied to both the image folder and label mask folder. After that, 2 text files named `train.txt` and `val.txt` need to be created. These files contains the images used for training and validation.  -->
 
-After that, 2 text files named `train.txt` and `val.txt` need to be created. These files contains the images used for training and validation. You may find the examples for these 2 files [here](https://drive.google.com/drive/folders/1f9olh2BeuIMEyCWNTdsK6JSv_ZiOgVgh?usp=sharing). Below is the recomended folder structure
+After downloading the zip file above, as well as unzipping it into `data` folder, you should have something like following:
 
 ```
-DATA_DIR
+data
 │   train.txt
 │   val.txt    
 │
-└───img
+└───separated_img
 │   │   001_0000.png
 │   │   ...
 │   
-└───mask
-    │   001_0000.png
-    │   ...
+└───separated_mask
+│   │   001_0000.png
+│   │   ...
+│
+│___ ...
 ```
 
+## Run training
 You also need to modify the `script/config.py` as follows:
-- Line 43 represents image's path 
+- Line 43 represents image's path
 - Line 44 represents label mask's path
 - Line 77 represents data folder's path
-- Line 141 represents path where the model will be saved 
+- Line 141 represents path where the model will be saved.
+The current file has been hard-coded for your convenience. 
 
-Finnally, you can run the training script:
+Finally, you can run the training script:
 ```
 python script/train.py 
 ```
@@ -74,4 +81,4 @@ To convert trained models to Torch Script format, use the following command with
 python script/create_torchscript.py --in_model INPUT_MODEL --out_model OUTPUT_MODEL
 ```
 
-In the command above, `INPUT_MODEL` is the path to .pth file and `OUTPUT_MODEL` is the path to .pt file. For example: `python script/create_torchscript.py --in_model ./weight/best.pth --out_model ./weight/best.pt`
+In the command above, `INPUT_MODEL` is the path to .pth file and `OUTPUT_MODEL` is the path to .pt file. For example: `python script/create_torchscript.py --in_model ./weight/latest.pth --out_model ./weight/latest.pt`

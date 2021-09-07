@@ -117,21 +117,21 @@ cfg.data.train.data_root = cfg.data_root
 cfg.data.train.img_dir = img_dir
 cfg.data.train.ann_dir = mask_dir
 cfg.data.train.pipeline = cfg.train_pipeline
-cfg.data.train.split = 'train.txt'
+cfg.data.train.split = './data/train.txt'
 
 cfg.data.val.type = cfg.dataset_type
 cfg.data.val.data_root = cfg.data_root
 cfg.data.val.img_dir = img_dir
 cfg.data.val.ann_dir = mask_dir
 cfg.data.val.pipeline = cfg.test_pipeline
-cfg.data.val.split = 'val.txt'
+cfg.data.val.split = './data/val.txt'
 
 cfg.data.test.type = cfg.dataset_type
 cfg.data.test.data_root = cfg.data_root
 cfg.data.test.img_dir = img_dir
 cfg.data.test.ann_dir = mask_dir
 cfg.data.test.pipeline = cfg.test_pipeline
-cfg.data.test.split = 'val.txt'
+cfg.data.test.split = './data/val.txt'
 
 # We can still use the pre-trained Mask RCNN model though we do not need to
 # use the mask branch
