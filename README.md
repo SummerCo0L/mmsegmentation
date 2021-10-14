@@ -19,6 +19,14 @@ pip install -U scikit-learn
 pip install -e .
 ```
 
+or pulling from DockerHub
+
+```
+docker pull quoccuongcs/uit_vnu
+```
+
+
+
 # Inference
 
 Firstly, you need to download our [pretrained model](https://drive.google.com/file/d/1bAU4YvkViXv6rCUXwrMV4ydbbpaOWiih/view?usp=sharing) from Google Drive and put them anywhere.
