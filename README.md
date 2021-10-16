@@ -19,13 +19,6 @@ pip install -U scikit-learn
 pip install -e .
 ```
 
-or pulling from DockerHub
-
-```
-docker pull quoccuongcs/uit_vnu
-```
-
-
 
 # Inference
 
@@ -38,6 +31,20 @@ python script/inference.py --model MODEL_PATH --input INPUT --output OUTPUT
 ```
 
 You will need to adapt the corresponding path to your TorchScript model, your folder that contains .nii files and folder that are supposed to contain the .nii output.
+
+*Note*: We have made our Docker public in DockerHub. This Docker image can also be used to reproduce the inference result.
+
+Pulling from DockerHub
+
+```
+docker pull quoccuongcs/uit_vnu
+```
+
+Create a container and run inference with
+
+```
+docker container run --gpus "device=1" --name uit_vnu --rm -v $PWD/inputs/:/workspace/inputs/ -v $PWD/TeamName_outputs/:/workspace/outputs/ teamname:latest /bin/bash -c "sh predict.sh"
+```
 
 # Train
 
