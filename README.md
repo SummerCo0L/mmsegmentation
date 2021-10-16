@@ -43,7 +43,7 @@ docker pull quoccuongcs/uit_vnu
 Create a container and run inference with
 
 ```
-docker container run --gpus "device=1" --name uit_vnu --rm -v $PWD/inputs/:/workspace/inputs/ -v $PWD/TeamName_outputs/:/workspace/outputs/ teamname:latest /bin/bash -c "sh predict.sh"
+docker container run --gpus "device=1" --name uit_vnu --rm -v $PWD/inputs/:/workspace/inputs/ -v $PWD/TeamName_outputs/:/workspace/outputs/ quoccuongcs/uit_vnu:latest /bin/bash -c "sh predict.sh"
 ```
 
 # Train
