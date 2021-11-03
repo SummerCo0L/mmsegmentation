@@ -97,3 +97,8 @@ python script/create_torchscript.py --in_model INPUT_MODEL --out_model OUTPUT_MO
 ```
 
 In the command above, `INPUT_MODEL` is the path to .pth file and `OUTPUT_MODEL` is the path to .pt file. For example: `python script/create_torchscript.py --in_model ./weight/latest.pth --out_model ./weight/latest.pt`
+
+# Our Result of FLARE 2021 challenge
+<div align="center">
+  <img src="2021.09-FLARE21-new_06.jpg" width="600"/>
+</div>
